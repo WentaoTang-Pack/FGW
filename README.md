@@ -35,7 +35,7 @@ If you use this toolbox in your research and find it useful, please cite FGW usi
 ### Prerequisites
 
 * For graph tools [networkx](https://networkx.github.io/) Networkx (>=2.0)
-* For the classification using Graph Kernels using [GraKel](https://ysig.github.io/GraKeL/dev/) GraKel (>=0.1a5) 
+* For the classification using Graph Kernels using [GraKel](https://ysig.github.io/GraKeL/0.1a8/) GraKel (>=0.1a5) 
 * For Optimal transport [Python Optimal Transport](https://pot.readthedocs.io/en/stable/) POT (>=0.5.1)
 * Sklearn (>=0.20.0)
 * Numpy (>=1.11)

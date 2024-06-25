@@ -72,7 +72,7 @@ class GenericSVCClassifier(TransformerMixin):
         self.similarity_measure_time.append(end-start)
         return similarity
 
-    def gram_matrix(self,X,Y,matrix=None,method='classic'):
+    def gram_matrix(self,X,Y,matrix=None,method='classic',fitting=False):
         """ Compute the similarity matrix K=exp{-gamma*f(x,y)} with f the similarity measure 
         for all x,y in X and Y 
         Parameters
@@ -88,7 +88,7 @@ class GenericSVCClassifier(TransformerMixin):
         D : ndarray
             The gram matrix of all similarities K=exp{-gamma*f(x,y)} or f(x,y) if method='no_gaussian'
         """
-        self.compute_all_distance(X,Y,matrix)
+        self.compute_all_distance(X,Y,matrix,fitting=fitting)
         if method=='classic':
             Z=np.exp(-self.gamma*(self.D))
             if not self.assert_all_finite(Z):
@@ -115,7 +115,7 @@ class GenericSVCClassifier(TransformerMixin):
         Gtrain = np.zeros((X.shape[0],X.shape[0]))
         start=time.time()
         try :
-            Gtrain = self.gram_matrix(X,X,matrix,method='classic')
+            Gtrain = self.gram_matrix(X,X,matrix,method='classic',fitting=True)
             self.svc.fit(Gtrain,self.classes_)
             if self.verbose:
                 print('Time fit : ',time.time()-start)
@@ -136,7 +136,7 @@ class GenericSVCClassifier(TransformerMixin):
         self
         """
         try :
-            G=self.gram_matrix(X,self._fit_X,matrix,method='classic')
+            G=self.gram_matrix(X,self._fit_X,matrix,method='classic',fitting=False)
             preds=self.svc.predict(G)
 
         except InfiniteException:
@@ -163,7 +163,7 @@ class GenericSVCClassifier(TransformerMixin):
         else :
             return True
 
-    def compute_all_distance(self,X,Y,matrix=None): 
+    def compute_all_distance(self,X,Y,matrix=None,fitting=False): 
         """ Compute all similarities f(x,y) for x,y in X and Y and f the similarity measure 
         Parameters
         ----------
@@ -179,12 +179,11 @@ class GenericSVCClassifier(TransformerMixin):
             self.D=matrix
 
         else:
-            X=X.reshape(X.shape[0],) #idem
-            Y=Y.reshape(Y.shape[0],) #idem
-
-            if np.all(X==Y):
+            X=X.reshape(X.shape[0],)
+            Y=Y.reshape(Y.shape[0],) 
+            if fitting:
                 D= np.zeros((X.shape[0], Y.shape[0]))
-                H=np.zeros((X.shape[0], Y.shape[0]))
+                H= np.zeros((X.shape[0], Y.shape[0]))
                 for i, x1 in enumerate(X):
                     for j,x2 in enumerate(Y):
                         if j>=i:
